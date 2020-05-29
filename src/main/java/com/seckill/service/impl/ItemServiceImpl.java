@@ -6,8 +6,10 @@ import com.seckill.dataobject.ItemDO;
 import com.seckill.dataobject.ItemStockDO;
 import com.seckill.error.BusinessException;
 import com.seckill.error.EmBusinessError;
+import com.seckill.service.IPromoService;
 import com.seckill.service.ItemService;
 import com.seckill.service.model.ItemModel;
+import com.seckill.service.model.PromoModel;
 import com.seckill.validator.ValidationResult;
 import com.seckill.validator.ValidatorImpl;
 import org.springframework.beans.BeanUtils;
@@ -30,6 +32,9 @@ public class ItemServiceImpl implements ItemService {
 
     @Autowired
     ItemStockMapper stockMapper;
+
+    @Autowired
+    IPromoService promoService;
 
     @Override
     @Transactional
@@ -83,8 +88,17 @@ public class ItemServiceImpl implements ItemService {
         // 获取库存数量
         ItemStockDO stockDO = stockMapper.selectByItemID(itemDO.getId());
 
-        ItemModel model = convertModelFromDataObj(itemDO, stockDO);
-        return model;
+        ItemModel itemModel = convertModelFromDataObj(itemDO, stockDO);
+
+        // 获取商品的活动信息
+        PromoModel promoModel = promoService.getPromoByItemID(itemModel.getId());
+        // 没有秒杀活动或秒杀活动已停止
+        if (promoModel == null || promoModel.getStatus() == 3) {
+            return itemModel;
+        }
+
+        itemModel.setPromoModel(promoModel);
+        return itemModel;
     }
 
     @Override

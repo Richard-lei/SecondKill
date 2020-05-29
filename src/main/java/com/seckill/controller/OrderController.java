@@ -26,9 +26,10 @@ public class OrderController extends BaseController{
     @Autowired
     private HttpServletRequest httpServletRequest;
 
-    @RequestMapping(value = "/createOrder", method = RequestMethod.POST, consumes = CONTENT_TYPE_FORMED)
+    @RequestMapping(value = "/createOrder", method = RequestMethod.GET)
     @ResponseBody
     public CommonResponse createOrder(@RequestParam("itemId") Integer itemID,
+                                      @RequestParam(value = "promoId", required = false) Integer promoID,
                                       @RequestParam("amount") Integer amount) throws BusinessException {
 
         // 获取用户的登录信息
@@ -41,7 +42,7 @@ public class OrderController extends BaseController{
         UserModel userModel = (UserModel) this.httpServletRequest.getSession().getAttribute("LOGIN_USER");
 
         // 创建订单
-        OrderModel orderModel = orderService.createOrder(userModel.getId(), itemID, amount);
+        OrderModel orderModel = orderService.createOrder(userModel.getId(), itemID, promoID, amount);
 
         OrderVO orderVO = convertOrderVoFromModel(orderModel);
         return new CommonResponse("success", orderVO);

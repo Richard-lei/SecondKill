@@ -6,6 +6,8 @@ import com.seckill.error.BusinessException;
 import com.seckill.response.CommonResponse;
 import com.seckill.service.impl.ItemServiceImpl;
 import com.seckill.service.model.ItemModel;
+import com.seckill.service.model.PromoModel;
+import org.joda.time.format.DateTimeFormat;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -81,6 +83,17 @@ public class ItemController extends BaseController {
 
         ItemVO itemVO = new ItemVO();
         BeanUtils.copyProperties(model, itemVO);
+        PromoModel promoModel = model.getPromoModel();
+        if (promoModel != null) {
+            itemVO.setPromoID(promoModel.getId());
+            itemVO.setPromoStatus(promoModel.getStatus());
+            itemVO.setPromoPrice(promoModel.getPromoPrice());
+            itemVO.setStartDate(promoModel.getStartDate().toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")));
+        }
+        else {
+            itemVO.setPromoStatus(0);
+        }
+
 
         return itemVO;
     }
